@@ -15,7 +15,7 @@ const transformData = data => {
     const event = title.substring(delimiterIndex + 1, title.length).trim();
 
     return {
-        coordinates: [parseFloat(latitude), parseFloat(longitude)],
+        coordinates: [parseFloat(longitude), parseFloat(latitude)],
         zipCode,
         category,
         event,
