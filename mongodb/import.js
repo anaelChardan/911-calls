@@ -34,7 +34,7 @@ const insertCalls = (db, callback) => {
         .on('data', data => calls.push(transformData(data)))
         .on('end', () => {
             collection.insertMany(calls, (err, result) => {
-                if (err) console.log(err)
+                if (err) console.error(err)
                 else callback(result)
             });
         });
