@@ -29,11 +29,50 @@ Afin de répondre aux différents problèmes, vous allez avoir besoin de créer 
 
 ## Requêtes
 
-À vous de jouer ! Écrivez les requêtes MongoDB permettant de résoudre les problèmes posés.
+Création de l'index géographique sur le champ **coordinates** : `db.calls.createIndex( { coordinates : "2dsphere" } )`
+
+Création de l'index texte sur le champ **title** : `db.calls.createIndex( { title : "text" } )`
+
+### Nombre d'appels autour de Landscale dans un rayon de 500 mètres
 
 ```
-TODO : ajouter les requêtes MongoDB ici
+db.calls.find(
+   {
+     coordinates:
+       { 
+         $near :
+          {
+            $geometry: { 
+              type: "Point",
+              coordinates: [-75.283783, 40.241493 ]
+            },
+            $maxDistance: 500
+          }
+       }
+   }
+).count()
 ```
+
+### Nombre d'appels par catégorie
+
+Pour EMS : `db.calls.find({"category": "EMS"}).count()`
+
+Pour Fire : `db.calls.find({"category": "Fire"}).count()`
+
+Pour Traffic : `db.calls.find({"category": "Traffic"}).count()`
+
+Pour obtenir les trois à partir d'une seule requête :
+```
+db.calls.aggregate([
+    { 
+      "$group": {
+        "_id": '$category',
+        "count": { "$sum": 1 } 
+      }
+    }
+])
+```
+
 
 Vous allez sûrement avoir besoin de vous inspirer des points suivants de la documentation :
 
