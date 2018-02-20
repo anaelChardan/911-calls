@@ -19,10 +19,56 @@ GET <nom de votre index>/_count
 
 ## Requêtes
 
-À vous de jouer ! Écrivez les requêtes ElasticSearch permettant de résoudre les problèmes posés.
+### Nombre d'appels autour de Landscale dans un rayon de 500 mètres
 
 ```
-TODO : ajouter les requêtes ElasticSearch ici
+GET 911/_search
+{
+    "query": {
+        "bool" : {
+            "must" : {
+                "match_all" : {}
+            },
+            "filter" : {
+                "geo_distance" : {
+                    "distance" : "500m",
+                    "coordinates" : {
+                        "lon" : -75.283783,
+                        "lat" :  40.241493
+                    }
+                }
+            }
+        }
+    }
+}
+
+# Résultat
+"total": 717
+```
+
+### Nombre d'appels par catégorie
+
+```
+
+# Résultat
+
+```
+
+
+### Les trois mois ayant comptabilisés le plus d'appel
+
+```
+
+# Résultat
+
+```
+
+### Top 3 des villes avec le plus d'appels pour overdose
+
+```
+
+#Résultat
+
 ```
 
 ## Kibana

@@ -19,7 +19,7 @@ const transformData = data => {
   const event = title.substring(delimiterIndex + 1, title.length).trim();
 
   return {
-      coordinates: [parseFloat(longitude), parseFloat(latitude)],
+      coordinates: { lon: parseFloat(longitude), lat: parseFloat(latitude)},
       zipCode,
       category,
       event,
@@ -38,6 +38,22 @@ const createBulkQuery = chunks => {
 
   return { body };
 }
+
+
+esClient.indices.create({ 
+  index: '911',
+  body : {
+    mappings: {
+      call: {
+        properties : {
+          coordinates : { type: 'geo_point' }
+        }
+      }
+    }
+  }
+  }, (err, resp) => {
+  if (err) console.trace(err.message);
+});
 
 const calls = [];
 
