@@ -36,7 +36,7 @@ Création de l'index texte sur le champ **title** : `db.calls.createIndex( { eve
 ### Nombre d'appels autour de Landscale dans un rayon de 500 mètres
 
 ```
-> db.calls.find(
+db.calls.find(
   {
     coordinates: { 
       $near : {
@@ -57,7 +57,7 @@ Création de l'index texte sur le champ **title** : `db.calls.createIndex( { eve
 ### Nombre d'appels par catégorie
 
 ```
-> db.calls.aggregate([
+db.calls.aggregate([
     { 
       $group: {
         _id: "$category",
