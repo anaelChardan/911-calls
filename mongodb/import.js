@@ -19,7 +19,7 @@ const transformData = data => {
         zipCode,
         category,
         event,
-        date,
+        date: new Date(date),
         neighbourhood,
         address
     };
