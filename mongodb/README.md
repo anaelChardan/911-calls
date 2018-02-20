@@ -31,48 +31,124 @@ Afin de répondre aux différents problèmes, vous allez avoir besoin de créer 
 
 Création de l'index géographique sur le champ **coordinates** : `db.calls.createIndex( { coordinates : "2dsphere" } )`
 
-Création de l'index texte sur le champ **title** : `db.calls.createIndex( { title : "text" } )`
+Création de l'index texte sur le champ **title** : `db.calls.createIndex( { event : "text" } )`
 
 ### Nombre d'appels autour de Landscale dans un rayon de 500 mètres
 
 ```
-db.calls.find(
-   {
-     coordinates:
-       { 
-         $near :
-          {
-            $geometry: { 
-              type: "Point",
-              coordinates: [-75.283783, 40.241493 ]
-            },
-            $maxDistance: 500
-          }
-       }
-   }
+> db.calls.find(
+  {
+    coordinates: { 
+      $near : {
+        $geometry: { 
+          type: "Point",
+            coordinates: [-75.283783, 40.241493 ]
+        },
+        $maxDistance: 500
+      }
+    }
+  }
 ).count()
+
+# Résultat
+717
 ```
 
 ### Nombre d'appels par catégorie
 
-Pour EMS : `db.calls.find({"category": "EMS"}).count()`
-
-Pour Fire : `db.calls.find({"category": "Fire"}).count()`
-
-Pour Traffic : `db.calls.find({"category": "Traffic"}).count()`
-
-Pour obtenir les trois à partir d'une seule requête :
 ```
-db.calls.aggregate([
+> db.calls.aggregate([
     { 
-      "$group": {
-        "_id": '$category',
-        "count": { "$sum": 1 } 
+      $group: {
+        _id: "$category",
+        count: { $sum: 1 } 
       }
     }
 ])
+
+# Résultat
+{ "_id" : "Traffic", "count" : 54549 }
+{ "_id" : "Fire", "count" : 23056 }
+{ "_id" : "EMS", "count" : 75589 }
+
 ```
 
+
+### Les trois mois ayant comptabilisés le plus d'appel
+
+```
+db.calls.aggregate([
+  {
+    $project : {   
+      month: { $month : "$date" },
+      year: { $year: "$date" }
+    }
+  },
+  {
+    $project : {
+      monthYear: { 
+        $concat: [ 
+          { $substr: ["$month",0,2] },
+          "/",
+          { $substr: ["$year",0,4] } 
+        ]
+      }
+    }
+  },
+  {
+    $group: {
+      _id: "$monthYear",
+      count: { $sum: 1 } 
+    }
+  },
+  {
+    $sort: {
+      count: -1
+    }
+  },
+  {
+    $limit: 3
+  }
+])
+
+# Résultat
+{ "_id" : "1/2016", "count" : 13084 }
+{ "_id" : "10/2016", "count" : 12502 }
+{ "_id" : "12/2016", "count" : 12162 }
+```
+
+### Top 3 des villes avec le plus d'appels pour overdose
+
+```
+db.calls.aggregate([
+  {
+    $match: {
+      $text: {
+        $search : "OVERDOSE"
+      }
+    }
+  },
+  {
+    $group: {
+      _id: "$neighbourhood",
+      count: { $sum: 1}
+    }
+  },
+  {
+    $sort: {
+      count: -1
+    }
+  },
+  {
+    $limit: 3
+  }
+])
+
+#Résultat
+{ "_id" : "POTTSTOWN", "count" : 203 }
+{ "_id" : "NORRISTOWN", "count" : 180 }
+{ "_id" : "UPPER MORELAND", "count" : 110 }
+```
 
 Vous allez sûrement avoir besoin de vous inspirer des points suivants de la documentation :
 
