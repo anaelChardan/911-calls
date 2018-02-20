@@ -5,6 +5,8 @@ var fs = require('fs');
 var MongoClient = mongodb.MongoClient;
 var mongoUrl = 'mongodb://localhost:27017/911-calls';
 
+
+
 var insertCalls = function(db, callback) {
     var collection = db.collection('calls');
 
@@ -12,7 +14,24 @@ var insertCalls = function(db, callback) {
     fs.createReadStream('../911.csv')
         .pipe(csv())
         .on('data', data => {
-            var call : {}; // TODO créer l'objet call à partir de la ligne
+            // On prend pas la description et le e car useless
+            const { lat: latitude, lng: longitude, zip: zipCode, title, timeStamp: date, twp : neighbourhood, addr: address } = data;
+
+            const delimiterIndex = title.indexOf(':');
+            const category = title.substring(0, delimiterIndex);
+            
+            const event = title.substring(delimiterIndex + 1, title.length).trim();
+
+            var call = {
+                coordinates : [parseFloat(latitude), parseFloat(longitude)],
+                zipCode,
+                category,
+                event,
+                date,
+                neighbourhood,
+                address
+            };
+
             calls.push(call);
         })
         .on('end', () => {
