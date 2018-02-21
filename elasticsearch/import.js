@@ -1,6 +1,6 @@
-var elasticsearch = require('elasticsearch');
-var csv = require('csv-parser');
-var fs = require('fs');
+const elasticsearch = require('elasticsearch');
+const csv = require('csv-parser');
+const fs = require('fs');
 
 const esClient = new elasticsearch.Client({
   host: 'localhost:9200',
