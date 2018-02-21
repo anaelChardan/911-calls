@@ -22,8 +22,9 @@ GET <nom de votre index>/_count
 ### Nombre d'appels autour de Landscale dans un rayon de 500 mètres
 
 ```
-GET 911/_search?size=0
+GET 911/call/_search
 {
+    "size": 0,
     "query": {
         "bool" : {
             "must" : {
@@ -53,8 +54,9 @@ GET 911/_search?size=0
 ### Nombre d'appels par catégorie
 
 ```
-GET 911/_search?size=0
+GET 911/call/_search
 {
+  "size": 0, 
   "aggs" :{
     "total_count" : {
       "global" : {}
@@ -104,17 +106,171 @@ GET 911/_search?size=0
 ### Les trois mois ayant comptabilisés le plus d'appel
 
 ```
+GET 911/call/_search
+{
+  "size" : 0,
+  "aggs" : {
+    "calls" : {
+      "date_histogram" : {
+        "field" : "date",
+        "interval" : "month",
+        "order" : { "_count" : "desc" }
+      }
+    }
+  }
+}
 
 # Résultat
-
+"aggregations": {
+    "calls": {
+      "buckets": [
+        {
+          "key_as_string": "2016-01-01T00:00:00.000Z",
+          "key": 1451606400000,
+          "doc_count": 13084
+        },
+        {
+          "key_as_string": "2016-10-01T00:00:00.000Z",
+          "key": 1475280000000,
+          "doc_count": 12502
+        },
+        {
+          "key_as_string": "2016-12-01T00:00:00.000Z",
+          "key": 1480550400000,
+          "doc_count": 12162
+        },
+        {
+          "key_as_string": "2016-11-01T00:00:00.000Z",
+          "key": 1477958400000,
+          "doc_count": 12092
+        },
+        {
+          "key_as_string": "2016-07-01T00:00:00.000Z",
+          "key": 1467331200000,
+          "doc_count": 12074
+        },
+        {
+          "key_as_string": "2016-08-01T00:00:00.000Z",
+          "key": 1470009600000,
+          "doc_count": 11910
+        },
+        {
+          "key_as_string": "2016-06-01T00:00:00.000Z",
+          "key": 1464739200000,
+          "doc_count": 11746
+        },
+        {
+          "key_as_string": "2016-09-01T00:00:00.000Z",
+          "key": 1472688000000,
+          "doc_count": 11669
+        },
+        {
+          "key_as_string": "2016-02-01T00:00:00.000Z",
+          "key": 1454284800000,
+          "doc_count": 11394
+        },
+        {
+          "key_as_string": "2016-05-01T00:00:00.000Z",
+          "key": 1462060800000,
+          "doc_count": 11368
+        },
+        {
+          "key_as_string": "2016-04-01T00:00:00.000Z",
+          "key": 1459468800000,
+          "doc_count": 11280
+        },
+        {
+          "key_as_string": "2016-03-01T00:00:00.000Z",
+          "key": 1456790400000,
+          "doc_count": 11074
+        },
+        {
+          "key_as_string": "2015-12-01T00:00:00.000Z",
+          "key": 1448928000000,
+          "doc_count": 7935
+        },
+        {
+          "key_as_string": "2017-01-01T00:00:00.000Z",
+          "key": 1483228800000,
+          "doc_count": 2904
+        }
+      ]
+    }
+  }
 ```
 
 ### Top 3 des villes avec le plus d'appels pour overdose
 
 ```
+GET /911/call/_search
+{
+    "size" : 0,
+    "query" : {
+      "term" : {
+        "event" : "overdose"
+      } 
+    },
+    "aggs" : {
+        "overdoses" : {
+            "terms": {
+                "field": "neighbourhood.keyword",
+                "order": {
+                    "_count" : "desc" 
+                }
+            }
+        }
+    }
+}
 
 #Résultat
-
+"aggregations": {
+    "overdoses": {
+      "doc_count_error_upper_bound": 24,
+      "sum_other_doc_count": 929,
+      "buckets": [
+        {
+          "key": "POTTSTOWN",
+          "doc_count": 203
+        },
+        {
+          "key": "NORRISTOWN",
+          "doc_count": 180
+        },
+        {
+          "key": "UPPER MORELAND",
+          "doc_count": 110
+        },
+        {
+          "key": "LOWER MERION",
+          "doc_count": 104
+        },
+        {
+          "key": "ABINGTON",
+          "doc_count": 95
+        },
+        {
+          "key": "UPPER MERION",
+          "doc_count": 72
+        },
+        {
+          "key": "LANSDALE",
+          "doc_count": 71
+        },
+        {
+          "key": "CHELTENHAM",
+          "doc_count": 68
+        },
+        {
+          "key": "LOWER PROVIDENCE",
+          "doc_count": 61
+        },
+        {
+          "key": "PLYMOUTH",
+          "doc_count": 55
+        }
+      ]
+    }
+  }
 ```
 
 ## Kibana
